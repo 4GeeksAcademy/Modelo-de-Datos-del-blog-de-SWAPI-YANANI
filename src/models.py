@@ -6,16 +6,16 @@ from sqlalchemy.orm import relationship, declarative_base
 from eralchemy2 import render_er
 
 
-DB = SQLAlchemy()
+db = SQLAlchemy()
 
 # TABLA DEL USUARIO
 
 
-class User(DB):
+class User(db.Model):
     __tablename__ = 'user'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[int] = mapped_column(
+    username: Mapped[str] = mapped_column(
         String(40), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(25), nullable=False)
     email: Mapped[str] = mapped_column(
@@ -37,7 +37,7 @@ class User(DB):
 
 
 # TABLA DE PERSONAGES----------------------------------------------------
-class characters(DB):
+class Characters(db.Model):
     __tablename__ = 'characters'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -54,7 +54,7 @@ class characters(DB):
  # TABLA DE PLANETAS------------------------------------------------------
 
 
-class Planets(DB):
+class Planets(db.Model):
     __tablename__ = 'planets'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -68,13 +68,13 @@ class Planets(DB):
 
 
 # TABLA DE VEHICULOS-----------------------------------------------------
-class Vehicles(DB):
+class Vehicles(db.Model):
     __tablename__ = 'vehicles'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     model: Mapped[str] = mapped_column(String(20), nullable=False)
-    vehicle_tipe: Mapped[str] = mapped_column(String(20), nullable=False)
+    vehicle_type: Mapped[str] = mapped_column(String(20), nullable=False)
     length: Mapped[str] = mapped_column(String(20), nullable=False)
     value: Mapped[str] = mapped_column(String(20), nullable=False)
     fuel_capacity: Mapped[str] = mapped_column(String(20), nullable=False)
@@ -84,14 +84,14 @@ class Vehicles(DB):
 
 
 # FAVORITOS-----------------------------------------------------
-class Favorite(DB):
+class Favorite(db.Model):
     __tablename__ = 'favorite'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(DB.ForeignKey('user.id'))
-    characters_id: Mapped[int] = mapped_column(DB.ForeignKey('characters.id'))
-    planet_id: Mapped[int] = mapped_column(DB.ForeignKey('planets.id'))
-    vehicle_id: Mapped[int] = mapped_column(DB.ForeignKey('vehicles.id'))
+    user_id: Mapped[int] = mapped_column(db.ForeignKey('user.id'))
+    characters_id: Mapped[int] = mapped_column(db.ForeignKey('characters.id')nullable=True)
+    planet_id: Mapped[int] = mapped_column(db.ForeignKey('planets.id')nullable=True)
+    vehicle_id: Mapped[int] = mapped_column(db.ForeignKey('vehicles.id')nullable=True)
 
 
-render_er(DB, 'diagram.png')
+render_er(db.metadata, 'diagram.png')
