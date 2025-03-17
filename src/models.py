@@ -1,78 +1,97 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Enum, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Boolean
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy.orm import relationship, declarative_base
+from eralchemy2 import render_er
 
-db = SQLAlchemy()
+
+DB = SQLAlchemy()
+
+# TABLA DEL USUARIO
 
 
-class User(db.Model):
+class User(DB):
+    __tablename__ = 'user'
+
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(nullable=False)
-    firstname: Mapped[str] = mapped_column(nullable=False)
-    lastname: Mapped[str] = mapped_column(nullable=False)
-
-  
-    posts = relationship("Post", back_populates="user", cascade="all, delete-orphan")
-    comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan")
+    username: Mapped[int] = mapped_column(
+        String(40), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(25), nullable=False)
+    email: Mapped[str] = mapped_column(
+        String(120), unique=True, nullable=False)
+    firstname: Mapped[str] = mapped_column(String(20), nullable=False)
+    lastname: Mapped[str] = mapped_column(String(20), nullable=False)
 
     def serialize(self):
         return {
             "id": self.id,
             "email": self.email,
+            "username": self.username,
             "firstname": self.firstname,
             "lastname": self.lastname,
+
         }
 
+    favorites = relationship('Favorite', backref='user', lazy=True)
 
-class Post(db.Model):
+
+# TABLA DE PERSONAGES----------------------------------------------------
+class characters(DB):
+    __tablename__ = 'characters'
+
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
+    name: Mapped[str] = mapped_column(String(20), nullable=False)
+    birth_year: Mapped[str] = mapped_column(String(20), nullable=False)
+    eye_color: Mapped[str] = mapped_column(String(20), nullable=False)
+    gender: Mapped[str] = mapped_column(String(20), nullable=False)
+    hair_color: Mapped[str] = mapped_column(String(20), nullable=False)
+    height: Mapped[str] = mapped_column(String(20), nullable=False)
+    url: Mapped[str] = mapped_column(String(200), nullable=False)
 
-   
-    user = relationship("User", back_populates="posts")
-    comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
-    media = relationship("Media", back_populates="post", cascade="all, delete-orphan")
+    favorites = relationship('Favorite', backref='characters', lazy=True)
 
-    def serialize(self):
-        return {
-            "id": self.id,
-            "user_id": self.user_id
-        }
+ # TABLA DE PLANETAS------------------------------------------------------
 
 
-class Comment(db.Model):
+class Planets(DB):
+    __tablename__ = 'planets'
+
     id: Mapped[int] = mapped_column(primary_key=True)
-    comment_text: Mapped[str] = mapped_column(String(200), nullable=False)
-    author_id: Mapped[int] = mapped_column(ForeignKey('user.id'), nullable=False)
-    post_id: Mapped[int] = mapped_column(ForeignKey('post.id'), nullable=False)
+    name: Mapped[str] = mapped_column(String(20), nullable=False)
+    climate: Mapped[str] = mapped_column(String(20), nullable=False)
+    rotation_time: Mapped[str] = mapped_column(String(20), nullable=False)
+    diameter: Mapped[str] = mapped_column(String(20), nullable=False)
+    gravity: Mapped[str] = mapped_column(String(20), nullable=False)
+
+    favorites = relationship('Favorite', backref='planets', lazy=True)
 
 
-    author = relationship("User", back_populates="comments")
-    post = relationship("Post", back_populates="comments")
+# TABLA DE VEHICULOS-----------------------------------------------------
+class Vehicles(DB):
+    __tablename__ = 'vehicles'
 
-    def serialize(self):
-        return {
-            "id": self.id,
-            "text": self.comment_text,
-            "author_id": self.author_id,
-            "post_id": self.post_id
-        }
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
+    model: Mapped[str] = mapped_column(String(20), nullable=False)
+    vehicle_tipe: Mapped[str] = mapped_column(String(20), nullable=False)
+    length: Mapped[str] = mapped_column(String(20), nullable=False)
+    value: Mapped[str] = mapped_column(String(20), nullable=False)
+    fuel_capacity: Mapped[str] = mapped_column(String(20), nullable=False)
+    url: Mapped[str] = mapped_column(String(200), nullable=False)
 
-
-class Media(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True, unique=True)
-    type: Mapped[str] = mapped_column(String(50), nullable=False)
-    url: Mapped[str] = mapped_column(String(400), nullable=False)
-    post_id: Mapped[int] = mapped_column(ForeignKey('post.id'), nullable=False)
+    favorites = relationship('Favorite', backref='vehicles', lazy=True)
 
 
-    post = relationship("Post", back_populates="media")
+# FAVORITOS-----------------------------------------------------
+class Favorite(DB):
+    __tablename__ = 'favorite'
 
-    def serialize(self):
-        return {
-            "id": self.id,
-            "type": self.type,
-            "url": self.url,
-            "post_id": self.post_id
-        }
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(DB.ForeignKey('user.id'))
+    characters_id: Mapped[int] = mapped_column(DB.ForeignKey('characters.id'))
+    planet_id: Mapped[int] = mapped_column(DB.ForeignKey('planets.id'))
+    vehicle_id: Mapped[int] = mapped_column(DB.ForeignKey('vehicles.id'))
+
+
+render_er(DB, 'diagram.png')
