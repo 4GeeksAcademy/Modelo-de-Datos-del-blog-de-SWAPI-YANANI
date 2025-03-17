@@ -9,7 +9,6 @@ verify_ssl = true
 flask = "*"
 sqlalchemy = "*"
 flask-sqlalchemy = "*"
-flask-migrate = "==4.0.5"
 flask-swagger = "==0.2.14"
 psycopg2-binary = "*"
 python-dotenv = "==1.0.0"
@@ -20,6 +19,7 @@ flask-admin = "==1.6.1"
 wtforms = "==3.0.1"
 eralchemy2 = "*"
 erdantic = "*"
+flask-migrate = "*"
 
 [requires]
 python_version = "3.13"

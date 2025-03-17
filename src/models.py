@@ -89,9 +89,9 @@ class Favorite(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(db.ForeignKey('user.id'))
-    characters_id: Mapped[int] = mapped_column(db.ForeignKey('characters.id')nullable=True)
-    planet_id: Mapped[int] = mapped_column(db.ForeignKey('planets.id')nullable=True)
-    vehicle_id: Mapped[int] = mapped_column(db.ForeignKey('vehicles.id')nullable=True)
+    characters_id: Mapped[int] = mapped_column(db.ForeignKey('characters.id'), nullable=True)
+    planet_id: Mapped[int] = mapped_column(db.ForeignKey('planets.id'), nullable=True)
+    vehicle_id: Mapped[int] = mapped_column(db.ForeignKey('vehicles.id'), nullable=True)
 
 
 render_er(db.metadata, 'diagram.png')
