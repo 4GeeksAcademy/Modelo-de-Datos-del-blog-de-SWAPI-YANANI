@@ -82,6 +82,19 @@ class Vehicles(db.Model):
 
     favorites = relationship('Favorite', backref='vehicles', lazy=True)
 
+# TABLA DE LOS MUCHACHOS-----------------------------------------------------
+class Muchachos(db.Model):
+    __tablename__ = 'Muchachos'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
+    group_name: Mapped[str] = mapped_column(String(20), nullable=False)
+    activity_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    length: Mapped[str] = mapped_column(String(20), nullable=False)
+    url: Mapped[str] = mapped_column(String(200), nullable=False)
+
+    favorites = relationship('Favorite', backref='Muchachos', lazy=True)
+
 
 # FAVORITOS-----------------------------------------------------
 class Favorite(db.Model):
@@ -92,6 +105,7 @@ class Favorite(db.Model):
     characters_id: Mapped[int] = mapped_column(db.ForeignKey('characters.id'), nullable=True)
     planet_id: Mapped[int] = mapped_column(db.ForeignKey('planets.id'), nullable=True)
     vehicle_id: Mapped[int] = mapped_column(db.ForeignKey('vehicles.id'), nullable=True)
+    Muchachos_id: Mapped[int] = mapped_column(db.ForeignKey('Muchachos.id'), nullable=True)
 
 
 render_er(db.metadata, 'diagram.png')
