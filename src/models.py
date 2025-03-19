@@ -82,6 +82,7 @@ class Vehicles(db.Model):
 
     favorites = relationship('Favorite', backref='vehicles', lazy=True)
 
+
 # TABLA DE LOS MUCHACHOS-----------------------------------------------------
 class Muchachos(db.Model):
     __tablename__ = 'Muchachos'
@@ -107,5 +108,14 @@ class Favorite(db.Model):
     vehicle_id: Mapped[int] = mapped_column(db.ForeignKey('vehicles.id'), nullable=True)
     Muchachos_id: Mapped[int] = mapped_column(db.ForeignKey('Muchachos.id'), nullable=True)
 
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'characters.id': self.characters_id,
+            'planets.id': self.planet_id,
+            'vehicles.id': self.vehicle_id,
+            'Muchachos.id': self.Muchachos_id,
+        }
 
 render_er(db.metadata, 'diagram.png')

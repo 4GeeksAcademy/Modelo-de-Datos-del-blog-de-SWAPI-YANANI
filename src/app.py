@@ -38,26 +38,24 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-#-----------------CHARACTER-----------------------------------#
-@app.routes('/characters', methods=['GET'])
+#-----------------CHARACTERS------------------------------------------------------------------------#
+@app.route('/characters', methods=['GET'])
 def get_all_characters():
 
-    character = Characters.query.all()
-    character_serialize = [character.serialize() for character in character]
+    characters = Characters.query.all()  
+    characters_serialize = [character.serialize() for character in characters]
 
-
-    if not Characters:
+    if not characters:
         return jsonify({
-            'msg': 'not found'
+            'msg': 'Not found'
         }), 404
-    
+
     return jsonify({
-        'msg': 'Characters successfully',
-        'characters': character_serialize
+        'msg': 'Characters successfully retrieved',
+        'characters': characters_serialize
     }), 200
 
-
-@app.route('/character/<int:character_id>', methods=['GET'])
+@app.route('/characters/<int:character_id>', methods=['GET'])
 def get_character(character_id):
 
     character = Characters.query.get(character_id)
@@ -68,31 +66,30 @@ def get_character(character_id):
         }), 404
 
     return jsonify({
-        'msg': 'character found',
+        'msg': 'Character found',
         'character': character.serialize()
     }), 200
 
 
-#-----------------PLANETS-----------------------------------#
-@app.routes('/planets', methods=['GET'])
+#-----------------PLANETS--------------------------------------------------------------------------#
+@app.route('/planets', methods=['GET'])
 def get_all_planets():
 
-    planet = Planets.query.all()
-    planet = [planet.serialize() for planet in planet]
+    planets = Planets.query.all()
+    planets_serialize = [planet.serialize() for planet in planets]
 
-
-    if not Planets:
+    if not planets:
         return jsonify({
-            'msg': 'not found'
+            'msg': 'Not found'
         }), 404
-    
+
     return jsonify({
-        'msg': 'Planets successfully',
-        'Planets': Planets.serialize()
+        'msg': 'Planets successfully retrieved',
+        'planets': planets_serialize
     }), 200
 
-@app.route('/planets/<int:planets_id>', methods=['GET'])
-def get_planets(planet_id):
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_planet(planet_id):
 
     planet = Planets.query.get(planet_id)
 
@@ -102,106 +99,188 @@ def get_planets(planet_id):
         }), 404
 
     return jsonify({
-        'msg': 'planet found',
+        'msg': 'Planet found',
         'planet': planet.serialize()
     }), 200
 
-#-----------------VEHICLES-----------------------------------#
-@app.routes('/vehicles', methods=['GET'])
-def get_all_vehicles():
 
-    vehicle = Vehicles.query.all()
-    vehicle = [vehicle.serialize() for vehicle in vehicle]
-
-
-    if not Vehicles:
-        return jsonify({
-            'msg': 'not found'
-        }), 404
-    
-    return jsonify({
-        'msg': 'Vehicles successfully',
-        'Vehicles': Vehicles.serialize()
-    }), 200
-
-@app.route('/vehicles/<int:planets_id>', methods=['GET'])
-def get_vehicle(vehicle_id):
-
-    vehicle = Vehicles.query.get(vehicle_id)
-
-    if not vehicle:
-        return jsonify({
-            'msg': 'Not found'
-        }), 404
-
-    return jsonify({
-        'msg': 'vehicle found',
-        'vehicle': vehicle.serialize()
-    }), 200
-
-#-----------------MUCHACHOS-----------------------------------
-@app.routes('/muchachos', methods=['GET'])
-def get_all_muchachos():
-
-    muchacho = Muchachos.query.all()
-    muchacho = [muchacho.serialize() for muchacho in muchacho]
-
-
-    if not Muchachos:
-        return jsonify({
-            'msg': 'not found'
-        }), 404
-    
-    return jsonify({
-        'msg': 'Muchachos successfully',
-        'Muchachos': Muchachos.serialize()
-    }), 200
-
-@app.route('/muchachos/<int:planets_id>', methods=['GET'])
-def get_muchacho(muchacho_id):
-
-    muchacho = Muchachos.query.get(muchacho_id)
-
-    if not muchacho:
-        return jsonify({
-            'msg': 'Not found'
-        }), 404
-
-    return jsonify({
-        'msg': 'muchacho found',
-        'muchacho': muchacho.serialize()
-    }), 200
-
-
-
-#-----------------USERS-----------------------------------
-@app.routes('/user', methods=['GET'])
+#-----------------USERS Y FAVORITES------------------------------------------------------------------#
+@app.route('/users', methods=['GET'])
 def get_all_users():
-    users = users.query.all()
+    users = User.query.all()
     users_serialize = [user.serialize() for user in users]
 
     return jsonify({
-        "msg": "Users retrieved succesfully",
+        "msg": "Users retrieved successfully",
         "users": users_serialize
     }), 200
 
 
-@app.routes('/user/favorite/<int:user_id>', method=['GET'])
-def get_users_fav(user_id):
+@app.route('/users/favorites', methods=['GET'])
+def get_user_favorites():
+    user_id = request.args.get('user_id') 
 
-    if not User:
+    if not user_id:
         return jsonify({
-            'msg': 'not found'
-        });404
+            'msg': 'User ID is required'
+        }), 400
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({
+            'msg': 'User not found'
+        }), 404
+
+    favorites = Favorite.query.filter_by(user_id=user.id).all()
+    favorites_serialize = [favorite.serialize() for favorite in favorites]
 
     return jsonify({
-        'msg': 'user found',
-        'User': User.serialize()
+        'msg': 'Favorites successfully retrieved',
+        'favorites': favorites_serialize
     }), 200
 
 
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def add_favorite_planet(planet_id):
+    user_id = request.args.get('user_id')  
+    if not user_id:
+        return jsonify({
+            'msg': 'User ID is required'
+        }), 400
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({
+            'msg': 'User not found'
+        }), 404
+
+    planet = Planets.query.get(planet_id)
+
+    if not planet:
+        return jsonify({
+            'msg': 'Planet not found'
+        }), 404
+
+    # ------------Verificar si el planeta ya es un favorito del usuario (ESTO LO PROPUSO GPT Y NO LE VOY A DECIR QUE NO)------------
+    existing_favorite = Favorite.query.filter_by(user_id=user.id, planet_id=planet.id).first()
+
+    if existing_favorite:
+        return jsonify({
+            'msg': 'Planet already in favorites'
+        }), 400
+
+   
+    new_favorite = Favorite(user_id=user.id, planet_id=planet.id)
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return jsonify({
+        'msg': 'Planet added to favorites successfully'
+    }), 200
 
 
+@app.route('/favorite/character/<int:character_id>', methods=['POST'])
+def add_favorite_character(character_id):
+    user_id = request.args.get('user_id')  
+
+    if not user_id:
+        return jsonify({
+            'msg': 'User ID is required'
+        }), 400
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({
+            'msg': 'User not found'
+        }), 404
+
+    character = Characters.query.get(character_id)
+
+    if not character:
+        return jsonify({
+            'msg': 'Character not found'
+        }), 404
+
+    
+    existing_favorite = Favorite.query.filter_by(user_id=user.id, characters_id=character.id).first()
+
+    if existing_favorite:
+        return jsonify({
+            'msg': 'Character already in favorites'
+        }), 400
+
+    
+    new_favorite = Favorite(user_id=user.id, characters_id=character.id)
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return jsonify({
+        'msg': 'Character added to favorites successfully'
+    }), 200
+
+
+@app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
+def remove_favorite_planet(planet_id):
+    user_id = request.args.get('user_id')  
+    if not user_id:
+        return jsonify({
+            'msg': 'User ID is required'
+        }), 400
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({
+            'msg': 'User not found'
+        }), 404
+
+    favorite = Favorite.query.filter_by(user_id=user.id, planet_id=planet_id).first()
+
+    if not favorite:
+        return jsonify({
+            'msg': 'Favorite planet not found'
+        }), 404
+
+    db.session.delete(favorite)
+    db.session.commit()
+
+    return jsonify({
+        'msg': 'Planet removed from favorites successfully'
+    }), 200
+
+
+@app.route('/favorite/character/<int:character_id>', methods=['DELETE'])
+def remove_favorite_character(character_id):
+    user_id = request.args.get('user_id')  
+
+    if not user_id:
+        return jsonify({
+            'msg': 'User ID is required'
+        }), 400
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({
+            'msg': 'User not found'
+        }), 404
+
+    favorite = Favorite.query.filter_by(user_id=user.id, characters_id=character_id).first()
+
+    if not favorite:
+        return jsonify({
+            'msg': 'Favorite character not found'
+        }), 404
+
+    db.session.delete(favorite)
+    db.session.commit()
+
+    return jsonify({
+        'msg': 'Character removed from favorites successfully'
+    }), 200
 
 
 
