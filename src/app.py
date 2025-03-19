@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User,  Characters, Planets, Vehicles, Muchachos
+from models import db, User,  Characters, Planets, Vehicles, Muchachos, Favorite
 # from models import Person
 
 app = Flask(__name__)
@@ -139,7 +139,7 @@ def get_vehicle(vehicle_id):
         'vehicle': vehicle.serialize()
     }), 200
 
-#-----------------MUCHACHOS-----------------------------------#
+#-----------------MUCHACHOS-----------------------------------
 @app.routes('/muchachos', methods=['GET'])
 def get_all_muchachos():
 
@@ -174,17 +174,7 @@ def get_muchacho(muchacho_id):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+#-----------------USERS-----------------------------------
 @app.routes('/user', methods=['GET'])
 def get_all_users():
     users = users.query.all()
@@ -194,6 +184,25 @@ def get_all_users():
         "msg": "Users retrieved succesfully",
         "users": users_serialize
     }), 200
+
+
+@app.routes('/user/favorite/<int:user_id>', method=['GET'])
+def get_users_fav(user_id):
+
+    if not User:
+        return jsonify({
+            'msg': 'not found'
+        });404
+
+    return jsonify({
+        'msg': 'user found',
+        'User': User.serialize()
+    }), 200
+
+
+
+
+
 
 
 # this only runs if `$ python src/app.py` is executed
