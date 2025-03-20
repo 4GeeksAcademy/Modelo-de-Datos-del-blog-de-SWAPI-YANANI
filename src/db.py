@@ -17,7 +17,7 @@ with app.app_context():
     ]
 
     # Datos para la tabla Characters
-    characters = [
+    characters_1 = [
         Characters(name="Luke Skywalker", birth_year="19BBY", eye_color="Blue", gender="Male",
                    hair_color="Blond", height="172", url="https://swapi.dev/api/people/1/"),
         Characters(name="Darth Vader", birth_year="41.9BBY", eye_color="Yellow", gender="Male",
@@ -87,7 +87,7 @@ with app.app_context():
     ]
 
     # Agregar los datos a la sesión y guardarlos en la base de datos
-    db.session.add_all(users + characters + planets + vehicles + muchachos + favorites)
+    db.session.add_all(users + characters_1 + planets + vehicles + muchachos + favorites)
     db.session.commit()
 
     print("Datos insertados correctamente en la base de datos.")

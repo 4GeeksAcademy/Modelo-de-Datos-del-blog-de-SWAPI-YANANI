@@ -12,8 +12,7 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
-    __tablename__ = 'user'
-
+    
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(
         String(40), unique=True, nullable=False)
@@ -38,7 +37,6 @@ class User(db.Model):
 
 # TABLA DE PERSONAGES----------------------------------------------------
 class Characters(db.Model):
-    __tablename__ = 'characters'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(20), nullable=False)
@@ -55,7 +53,7 @@ class Characters(db.Model):
 
 
 class Planets(db.Model):
-    __tablename__ = 'planets'
+    
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(20), nullable=False)
@@ -69,7 +67,7 @@ class Planets(db.Model):
 
 # TABLA DE VEHICULOS-----------------------------------------------------
 class Vehicles(db.Model):
-    __tablename__ = 'vehicles'
+    
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -85,7 +83,7 @@ class Vehicles(db.Model):
 
 # TABLA DE LOS MUCHACHOS-----------------------------------------------------
 class Muchachos(db.Model):
-    __tablename__ = 'Muchachos'
+    
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -94,19 +92,19 @@ class Muchachos(db.Model):
     length: Mapped[str] = mapped_column(String(20), nullable=False)
     url: Mapped[str] = mapped_column(String(200), nullable=False)
 
-    favorites = relationship('Favorite', backref='Muchachos', lazy=True)
+    favorites = relationship('Favorite', backref='Muchachos', lazy=True, cascade='all, delete-orphan') 
 
 
 # FAVORITOS-----------------------------------------------------
 class Favorite(db.Model):
-    __tablename__ = 'favorite'
+    
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(db.ForeignKey('user.id'))
     characters_id: Mapped[int] = mapped_column(db.ForeignKey('characters.id'), nullable=True)
     planet_id: Mapped[int] = mapped_column(db.ForeignKey('planets.id'), nullable=True)
     vehicle_id: Mapped[int] = mapped_column(db.ForeignKey('vehicles.id'), nullable=True)
-    Muchachos_id: Mapped[int] = mapped_column(db.ForeignKey('Muchachos.id'), nullable=True)
+    muchachos_id: Mapped[int] = mapped_column(db.ForeignKey('muchachos.id'), nullable=True)
 
 
     def serialize(self):
@@ -115,7 +113,7 @@ class Favorite(db.Model):
             'characters.id': self.characters_id,
             'planets.id': self.planet_id,
             'vehicles.id': self.vehicle_id,
-            'Muchachos.id': self.Muchachos_id,
+            'muchachos.id': self.muchachos_id,
         }
 
 render_er(db.metadata, 'diagram.png')
